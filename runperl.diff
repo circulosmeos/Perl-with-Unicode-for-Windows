@@ -1,0 +1,105 @@
+--- runperl.c.ORIGINAL	2017-06-30 23:01:20.000000000 +0200
++++ runperl.c	2018-11-11 18:05:42.441894100 +0100
+@@ -2,6 +2,15 @@
+ #include <crtdbg.h>
+ #endif
+ 
++#define WINVER 0x0600
++#define _WIN32_WINNT 0x0600
++#include "winnls.h"
++
++#include <windows.h>
++#include <fcntl.h>
++#include <io.h>
++#include <stdlib.h>
++
+ #include "EXTERN.h"
+ #include "perl.h"
+ 
+@@ -21,9 +30,54 @@
+ 
+ #endif
+ 
++static void
++error_exit(const wchar_t *msg)
++{
++    int err = GetLastError();
++    _setmode(_fileno(stderr), _O_U16TEXT);
++    fwprintf(stderr, L"%s: %d\n", msg, err);
++    exit( err );
++}
++
++static char *
++utf8_encode_wstring(const wchar_t *src)
++{
++    char *encoded;
++    int len;
++
++    len = WideCharToMultiByte( CP_UTF8, WC_ERR_INVALID_CHARS, src,
++            -1, NULL, 0, NULL, NULL);
++
++    encoded = malloc(len + 1);
++    if (!encoded) {
++        error_exit(L"Failed to allocate memory for UTF-8 encoded string");
++    }
++
++    (void) WideCharToMultiByte( CP_UTF8, WC_ERR_INVALID_CHARS, src,
++            -1, encoded, len, NULL, NULL);
++
++    return encoded;
++}
++
++static void
++utf8_encode_warr(const wchar_t **warr, const int n, char **arr)
++{
++    int i;
++
++    for (i = 0; i < n; ++i) {
++        arr[i] = utf8_encode_wstring(warr[i]);
++    }
++
++    return;
++}
++
+ int
+-main(int argc, char **argv, char **env)
++wmain(int argc, wchar_t **wargv, wchar_t **wenv)
+ {
++    char **argv;
++    char **env;
++    int env_count;
++
+ #ifdef _MSC_VER
+     /* Arrange for _CrtDumpMemoryLeaks() to be called automatically at program
+      * termination when built with CFG = DebugFull. */
+@@ -36,6 +90,30 @@
+     _CrtSetBreakAlloc(-1L);
+ #endif
+ 
++    ++argc; /* we are going to insert -CA between argv[0] and argv[1] */
++    argv = malloc((argc + 1) * sizeof(*argv));
++    if (!argv) {
++        error_exit(L"Failed to allocate memory of UTF-8 encoded argv");
++    }
++
++    argv[0] = utf8_encode_wstring(wargv[0]);
++    argv[1] = "-CA";
++    argv[ argc ] = NULL;
++
++    utf8_encode_warr(wargv + 1, argc - 1, argv + 2);
++
++    env_count = 0;
++    while ( wenv[env_count] ) {
++        ++env_count;
++    }
++    env = malloc( (env_count + 1) * sizeof(*env));
++    if (!env) {
++        error_exit(L"Failed to allocate memory for UTF-8 encoded environment");
++    }
++    env[ env_count ] = NULL;
++
++    utf8_encode_warr(wenv, env_count, env);
++
+     return RunPerl(argc, argv, env);
+ }
+ 
