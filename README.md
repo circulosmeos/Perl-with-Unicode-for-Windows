@@ -1,7 +1,7 @@
 # Perl with Unicode for Windows
 
 This repository contains instructions for recompiling the `perl.exe` executable **for Windows** (of the chosen Perl distribution), in order to make it **compatible with command line Unicode characters in Windows**:   
-Please note that actual distributions have not cared for Unicode treatment of Unicode in Windows, where it uses a UTF-16 codification, whereas the Perl cmdline executable as ported from linux (where these Unicode issues don't happen!) can't cope UTF-16 (or any other codification) at all in Windows.
+Please note that actual distributions have not cared for Unicode treatment of Unicode in Windows, where it uses a UTF-16 codification, whereas the Perl cmdline executable as ported from linux (where these Unicode issues don't happen!) can't manage UTF-16 (or any other codification) at all in Windows.
 
 The original patch comes from *A. Sinan Unur*'s brightening post *[Fixing Perl's Unicode problems on the command line on Windows: A trilogy in N parts](https://www.nu42.com/2017/02/perl-unicode-windows-trilogy-one.html)* and it is licensed under [Artistic License 2.0](https://opensource.org/licenses/Artistic-2.0).
 
