@@ -57,9 +57,13 @@ Please note that these binaries are distributed *as is* without any guarantee ex
 
 * [ActivePerl v5.24](https://github.com/circulosmeos/Perl-with-Unicode-for-Windows/releases/tag/ActivePerl-v5.24)
 
+## Longer explanation of the process
+
+Please, [check my blog entry](https://circulosmeos.wordpress.com/2018/11/12/perl-cmdline-with-unicode-in-windows/), specially notes under "Adapting the patch".
+
 ## Pending business !
 
-I'll upload more binaries and a longer explanation of the process *asap*.
+I'll upload more binaries *asap*.
 
 ## author
 
